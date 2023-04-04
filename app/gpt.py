@@ -56,6 +56,7 @@ def get_document_from_youtube_id(video_id):
 def remove_prompt_from_text(text):
     return text.replace('chatGPT:', '').strip()
 
+# 将url进行分类，每个类型使用不同的scrape方式
 def get_documents_from_urls(urls):
     documents = []
     for url in urls['page_urls']:
@@ -87,6 +88,7 @@ def get_index_from_web_cache(name):
         f"=====> Get index from web cache: {web_cache_file}")
     return index
 
+# 从磁盘中找到对应的index文件，直接进行加载
 def get_index_from_file_cache(name):
     file_cache_file = index_cache_file_dir / name
     if not file_cache_file.is_file():
@@ -119,6 +121,7 @@ def get_answer_from_llama_web(messages, urls):
     combained_urls = get_urls(urls)
     logging.info(combained_urls)
     index_file_name = get_unique_md5(urls)
+    # 先从本地缓存中查找当前url是否之前生成过index
     index = get_index_from_web_cache(index_file_name)
     if index is None:
         logging.info(f"=====> Build index from web!")
@@ -139,17 +142,21 @@ def get_answer_from_llama_web(messages, urls):
     total_embedding_model_tokens = index.embed_model.last_token_usage
     return answer, total_llm_model_tokens, total_embedding_model_tokens
 
+# 解析file，生成index，缓存到本地，并找到跟当前messages最相近的index
 def get_answer_from_llama_file(messages, file):
     dialog_messages = format_dialog_messages(messages)
     lang_code = get_language_code(remove_prompt_from_text(messages[-1]))
     index_name = get_index_name_from_file(file)
     index = get_index_from_file_cache(index_name)
+    # 如果未从本地缓存中加载index
     if index is None:
         logging.info(f"=====> Build index from file!")
+        #TODO 调动llama生成index的调用逻辑
         documents = SimpleDirectoryReader(input_files=[file]).load_data()
         index = GPTSimpleVectorIndex(documents)
         logging.info(
             f"=====> Save index to disk path: {index_cache_file_dir / index_name}")
+        # 将index保存到本地
         index.save_to_disk(index_cache_file_dir / index_name)
     prompt = get_prompt_template(lang_code)
     logging.info('=====> Use llama file with chatGPT to answer!')

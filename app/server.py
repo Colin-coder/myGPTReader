@@ -86,9 +86,12 @@ def insert_space(text):
 
     return text
 
+# thread_message_history记录某个thread的消息历史信息
 thread_message_history = {}
 MAX_THREAD_MESSAGE_HISTORY = 10
 
+# 更新某个thread_ts的历史信息
+# 有三种历史信息，message/url/file
 def update_thread_history(thread_ts, message_str=None, urls=None, file=None):
     if urls is not None:
         thread_message_history[thread_ts]['context_urls'].update(urls)
@@ -137,6 +140,7 @@ def format_dialog_text(text, voicemessage=None):
 def generate_message_id(channel, thread_ts):
     return f"{channel}-{thread_ts}"
 
+
 def update_token_usage(event, total_llm_model_tokens, total_embedding_model_tokens):
     logging.info("=====> Start to update token usage!")
     try:
@@ -177,6 +181,7 @@ def bot_process(event, say, logger):
         temp_file_path.mkdir(parents=True, exist_ok=True)
         temp_file_filename = temp_file_path / file["name"]
         with open(temp_file_filename, "wb") as f:
+            # 这里是从slack下载文件，保存到本地
             response = requests.get(url_private, headers={"Authorization": "Bearer " + slack_app.client.token})
             f.write(response.content)
             logger.info(f'=====> Downloaded file to save {temp_file_filename}')
@@ -185,9 +190,12 @@ def bot_process(event, say, logger):
             if not file_md5_name.exists():
                 logger.info(f'=====> Rename file to {file_md5_name}')
                 temp_file_filename.rename(file_md5_name)
+                # 如果文件是语音格式的文件，则调用whisper从语音转换为文字
                 if filetype in filetype_voice_extension_allowed:
                     voicemessage = get_text_from_whisper(file_md5_name)
 
+    # “event['ts']”指的是特定事件的时间戳，例如正在发送或编辑的消息。 “event['thread_ts']”指的是与事件关联的线程的时间戳
+    # 如果这个event属于某个thread，则返回thread的id，否则返回event的id
     parent_thread_ts = event["thread_ts"] if "thread_ts" in event else thread_ts
     if parent_thread_ts not in thread_message_history:
         thread_message_history[parent_thread_ts] = { 'dialog_texts': [], 'context_urls': set(), 'file': None}
@@ -196,6 +204,7 @@ def bot_process(event, say, logger):
         update_thread_history(parent_thread_ts, f'User: {format_dialog_text(event["text"], voicemessage)}', extract_urls_from_event(event))
 
     if file_md5_name is not None:
+        # 如果不是语音文件，需要更新文件历史信息
         if not voicemessage:
             update_thread_history(parent_thread_ts, None, None, file_md5_name)
     
