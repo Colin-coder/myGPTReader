@@ -16,6 +16,10 @@ from app.rate_limiter import RateLimiter
 from app.slash_command import register_slack_slash_commands
 from app.user import get_user, is_premium_user, update_message_token_usage
 from app.util import md5
+from dotenv import load_dotenv
+
+# 加载.env文件
+load_dotenv()
 
 class Config:
     SCHEDULER_API_ENABLED = True
