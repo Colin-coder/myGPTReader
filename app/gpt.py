@@ -15,6 +15,10 @@ from azure.cognitiveservices.speech.audio import AudioOutputConfig
 from app.fetch_web_post import get_urls, get_youtube_transcript, scrape_website, scrape_website_by_phantomjscloud
 from app.prompt import get_prompt_template
 from app.util import get_language_code, get_youtube_video_id
+from dotenv import load_dotenv
+
+# 加载.env文件
+load_dotenv()
 
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 SPEECH_KEY = os.environ.get('SPEECH_KEY')
