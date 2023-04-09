@@ -13,7 +13,7 @@
     <br> <a href="README.md">English</a> | 中文
 </p>
 <p align="center">
-    <em>A new way to read with AI bot - powered by chatGPT.</em>
+    <em>A community-driven way to read and chat with AI bots - powered by chatGPT.</em>
 </p>
 
 > 令人激动的是，这个项目的开发也是与 chatGPT 合作完成的。我在这个 [CDDR](docs/CDDR.md) 文件中记录了开发过程。
@@ -95,6 +95,7 @@
 - 目前，如果你想快速了解这个项目，可以参考以下 YouTube 我录制的介绍视频：
   [![myGPTReader Live Share](http://img.youtube.com/vi/XZIogwFU7jE/0.jpg)](https://www.youtube.com/live/XZIogwFU7jE?feature=share "myGPTReader介绍视频")
 - 博文：[我的 AI 阅读助手](https://www.bmpi.dev/self/my-gpt-reader/)
+- 博文：[ChatGPT应用开发小记](https://www.bmpi.dev/dev/chatgpt-development-notes/my-gpt-reader/)
 
 ## ✍️ 作者 <a name = "authors"></a>
 
